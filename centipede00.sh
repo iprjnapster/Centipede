@@ -198,15 +198,17 @@ difficulty_menu() {
     clear
     draw_border
 
-    local l1="Escolha o modo:"
-    local l2="1 - Fácil  (Velocidade Normal)"
-    local l3="2 - Médio  (8x mais rápido)"
-    local l4="3 - Difícil (16x mais rápido)"
+    local l1="Bem-vindo ao jogo Centipede!"
+    local l2="Escolha o modo:"
+    local l3="1 - Fácil   (Velocidade Normal)"
+    local l4="2 - Médio   (8x mais rápido)"
+    local l5="3 - Difícil (16x mais rápido)"
 
     local max=${#l1}
     (( ${#l2} > max )) && max=${#l2}
     (( ${#l3} > max )) && max=${#l3}
     (( ${#l4} > max )) && max=${#l4}
+    (( ${#l5} > max )) && max=${#l5}
 
     local box_w=$((LASTCOL - FIRSTCOL + 1))
     local col=$(( FIRSTCOL + (box_w - max) / 2 ))
@@ -216,14 +218,15 @@ difficulty_menu() {
     tput cup $((start_y+1)) "$col"; printf "%s" "$l2"
     tput cup $((start_y+2)) "$col"; printf "%s" "$l3"
     tput cup $((start_y+3)) "$col"; printf "%s" "$l4"
+    tput cup $((start_y+4)) "$col"; printf "%s" "$l5"
 
     local choice
     while true; do
         IFS= read -rsn1 choice
         case "$choice" in
             1) DELAY=$BASE_DELAY; break;;
-            2) DELAY=$(echo "$BASE_DELAY/8"  | bc -l); break;;
-            3) DELAY=$(echo "$BASE_DELAY/16" | bc -l); break;;
+            2) DELAY=$(awk "BEGIN {print $BASE_DELAY/8}") ; break;;
+            3) DELAY=$(awk "BEGIN {print $BASE_DELAY/16}") ; break;;
         esac
     done
 
@@ -240,17 +243,6 @@ center_message_in_box() {
     local col2=$(( FIRSTCOL + (box_w - ${#line2}) / 2  ))
     tput cup "$cy" "$col1"; printf "%s" "$line1"
     tput cup $((cy+1)) "$col2"; printf "%s" "$line2"
-}
-
-welcome_screen() {
-    clear
-    draw_border
-    local msg="Bem-vindo ao Centipede!"
-    local sub="Pressione qualquer tecla para continuar..."
-    center_message_in_box "$msg" "$sub"
-    IFS= read -rsn1
-    clear_inside
-    draw_border
 }
 
 end_menu() {
@@ -280,7 +272,6 @@ init_game() {
     tput civis
     tput sgr0
 
-    welcome_screen
     difficulty_menu
 
     POSX=$(( (FIRSTCOL + LASTCOL) / 2 ))
